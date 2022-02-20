@@ -20,8 +20,8 @@ If FileExist(MyIcon) {
 Global Overlay 		:= ""
 Global Speed		:= 1
 Global LClick		:= 0
-Global GuiX			:= 540
-Global GuiY			:= 985
+Global GuiX			:= 565
+Global GuiY			:= 1030
 Global APotOnOff	:= 0
 Global AQuitOnOff	:= 0
 Global AFLaskOnOff	:= 0
@@ -32,52 +32,25 @@ Global ForceLogout	:= 1
 Global IconMatchX	:= ""
 Global IconMatchY	:= ""
 
+Global TimeKeyQ		:= 50 + 0
+Global TimeKeyW		:= 50 + 0
+Global TimeKeyE		:= 50 + 12170
+Global TimeKeyR		:= 50 + 68220
+Global TimeKeyT		:= 50 + 18650
+
+Global TimeKey1		:= 50 + 0
+Global TimeKey2		:= 50 + 6000
+Global TimeKey3		:= 50 + 8500
+Global TimeKey4		:= 50 + 6000
+Global TimeKey5		:= 50 + 3400
+
+; Reading or creating config file
 if FileExist("hands.ini"){
 	Speed  := IniRead("hands.ini", "General", "Speed")
 	LClick := IniRead("hands.ini", "General", "LClick")
 } else {
 	IniWrite  Speed, "hands.ini", "General", "Speed"
 	IniWrite LClick, "hands.ini", "General", "LClick"
-}
-
-SetTimer GuiStatus, 50
-
-; Controls
-^1:: {
-
-}
-
-^2:: {
-	Global
-	if APotOnOff = 0 {
-		Overlay['T2'].Value := "Auto-Pot: ON"
-		APotOnOff := 1
-	} else {
-		Overlay['T2'].Value := "Auto-Pot: OFF"
-		APotOnOff := 0
-	}
-}
-
-^3:: {
-	Global
-	if AQuitOnOff = 0 {
-		Overlay['T3'].Value := "Auto-Quit: ON"
-		AQuitOnOff := 1
-	} else {
-		Overlay['T3'].Value := "Auto-Quit: OFF"
-		AQuitOnOff := 0
-	}
-}
-
-^4:: {
-	Global
-	if AFLaskOnOff = 0 {
-		Overlay['T4'].Value := "Auto-Flask: ON"
-		AFLaskOnOff := 1
-	} else {
-		Overlay['T4'].Value := "Auto-Flask: OFF"
-		AFLaskOnOff := 0
-	}
 }
 
 ; Functions
@@ -88,24 +61,93 @@ RandomSleep(min,max){
 	return
 }
 
-; Gui
+; Gui information refresh time
+SetTimer GuiStatus, 50
+
+; Controls
+^1:: {
+
+}
+
+^2:: { ;Auto-Pot
+	Global
+	if APotOnOff = 0 {
+		Overlay['T2'].SetFont("c004900")
+		Overlay['T2'].Value := "On "
+		APotOnOff := 1
+	} else {
+		Overlay['T2'].SetFont("cB9905F")
+		Overlay['T2'].Value := "Off"
+		APotOnOff := 0
+	}
+}
+
+^3:: { ;Auto-Quit
+	Global
+	if AQuitOnOff = 0 {
+		Overlay['T3'].SetFont("c004900")
+		Overlay['T3'].Value := "On "
+		AQuitOnOff := 1
+	} else {
+		Overlay['T3'].SetFont("cB9905F")
+		Overlay['T3'].Value := "Off"
+		AQuitOnOff := 0
+	}
+}
+
+^4:: { ;Auto-Flask
+	Global
+	if AFLaskOnOff = 0 {
+		Overlay['T4'].SetFont("c004900")
+		Overlay['T4'].Value := "On "
+		AFLaskOnOff := 1
+	} else {
+		Overlay['T4'].SetFont("cB9905F")
+		Overlay['T4'].Value := "Off"
+		AFLaskOnOff := 0
+	}
+}
+
+; Gui Overlay
 GuiStatus() {
 	Global
-	if WinActive("Path of Exile") and OnShow = 0 {
+	if WinActive("Path of Exile") and (OnShow = 0) and (ImageSearch(&IconMatchX, &IconMatchY, 7, 874, 26, 893, "*40 imgs\chaticon.png")) {
 		Overlay := Gui()
 		Overlay.Opt("+LastFound")
-		Overlay.SetFont("cFFFFF0 s10 w700", "Trebuchet MS")
-		Overlay.Add("Text", "y+0.5 BackgroundTrans vT1", "HP 100")
-		Overlay.Add("Text", "y+0.5 BackgroundTrans vT2", "Auto-Pot: OFF")
-		Overlay.Add("Text", "y+0.5 BackgroundTrans vT3", "Auto-Quit: OFF")
-		Overlay.Add("Text", "y+0.5 BackgroundTrans vT4", "Auto-Flask: OFF")
+		Overlay.SetFont("cE7B477 s10 w700", "Trebuchet MS")
+		Overlay.Add("Text", "BackgroundTrans vT1", "[ HP: 100 ]")
+		Overlay.Add("Text", "x+30 BackgroundTrans", "[ Auto-Pot: ")
+		if APotOnOff = 0 {
+			Overlay.Add("Text", "x+0.1 BackgroundTrans vT2", "Off")
+			Overlay['T2'].SetFont("cB9905F")
+		} else {
+			Overlay.Add("Text", "x+0.1 BackgroundTrans vT2", "On ")
+			Overlay['T2'].SetFont("c004900")
+		}
+		Overlay.Add("Text", "x+0.1 BackgroundTrans", " ]        [ Auto-Quit: ")
+		if AQuitOnOff = 0 {
+			Overlay.Add("Text", "x+0.1 BackgroundTrans vT3", "Off")
+			Overlay['T3'].SetFont("cB9905F")
+		} else {
+			Overlay.Add("Text", "x+0.1 BackgroundTrans vT3", "On ")
+			Overlay['T3'].SetFont("c004900")
+		}
+		Overlay.Add("Text", "x+0.1 BackgroundTrans", " ]        [ Auto-Flask: ")
+		if AFLaskOnOff = 0 {
+			Overlay.Add("Text", "x+0.1 BackgroundTrans vT4", "Off")
+			Overlay['T4'].SetFont("cB9905F")
+		} else {
+			Overlay.Add("Text", "x+0.1 BackgroundTrans vT4", "On ")
+			Overlay['T4'].SetFont("c004900")
+		}
+		Overlay.Add("Text", "x+0.1 BackgroundTrans", " ]")
 		Overlay.BackColor := "0X130F13"
 		WinsetTranscolor "0X130F13"
 		Overlay.Opt("+AlwaysOnTop -Border -Caption -Sysmenu +ToolWindow +E0x20")
 		Overlay.Show("x" . GuiX . " y" . GuiY . " NA")
 		OnShow := 1
 	}
-	if !WinActive("Path of Exile") and OnShow = 1 {
+	if (!WinActive("Path of Exile") and OnShow = 1) or (!ImageSearch(&IconMatchX, &IconMatchY, 7, 874, 26, 893, "*40 imgs\chaticon.png") and OnShow = 1) {
 		Overlay.Destroy()
 		OnShow := 0
 	}
@@ -132,9 +174,7 @@ MoveMouse(*) {
 	MouseMove 10, 875, 0, ""
 	Sleep 1000
 	MouseMove 22, 899, 0, ""
-	Sleep 1000
-
-
+	sleep 1000
 }
 
 Logout() {
@@ -145,19 +185,19 @@ Logout() {
 		Run "*RunAs cports.exe /close * * * * PathOfExile_x64Steam.exe"
 		Run "*RunAs cports.exe /close * * * * PathOfExileSteam.exe"
 		Run "*RunAs cports.exe /close * * * * PathOfExile.exe"
-		;Send "{Enter}/exit{Enter}"		
+		Send "{Enter}/exit{Enter}"		
 	} else {
 		Send "{Enter}/exit{Enter}"
 	}
-	RandomSleep(23,45)
+	RandomSleep(20,50)
 	BlockInput "Off"
 	return
 }
 
 if ImageSearch(&IconMatchX, &IconMatchY, 7, 874, 26, 893, "*40 imgs\chaticon.png") {
-	Send "{Enter}ok" IconMatchX "x" IconMatchY
+	;Send "{Enter}ok" IconMatchX "x" IconMatchY
 } else {
-	Send "{Enter}no"
+	;Send "{Enter}no"
 }
 
 
@@ -165,8 +205,6 @@ if WinActive("Path of Exile") {
 	~LButton:: {
 		if GetKeyState("LButton", "P") and AFLaskOnOff = 1 {
 			if !Keywait("LButton", "T.9") and LClick = 0 {
-				;RandomSleep(1,20)
-				;SendInput {MButton}
 				RandomSleep(1,20)
 				SendInput "e"
 				RandomSleep(1,20)
@@ -181,14 +219,13 @@ if WinActive("Path of Exile") {
 				SendInput "4"
 				RandomSleep(1,20)
 				SendInput "5"
-				;SetTimer, Bmb, 7650
-				SetTimer Be, 3130
-				SetTimer Br, 27700
-				SetTimer Bt, 10430
-				SetTimer B2, 5050
-				SetTimer B3, 5550
-				SetTimer B4, 3850
-				SetTimer B5, 6050
+				SetTimer Be, TimeKeyE
+				SetTimer Br, TimeKeyR
+				SetTimer Bt, TimeKeyT
+				SetTimer B2, TimeKey2
+				SetTimer B3, TimeKey3
+				SetTimer B4, TimeKey4
+				SetTimer B5, TimeKey5
 				Global LClick:=1
 			}
 		}
@@ -270,6 +307,9 @@ B5() {
 ~w:: {
 	RandomSleep(1,10)
 	SendInput "1"
-	;RandomSleep(10,20)
-	;SendInput {MButton}
+}
+
+~q:: {
+	RandomSleep(90,99)
+	SendInput "{MButton}"
 }
